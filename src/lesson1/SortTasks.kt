@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import java.lang.IllegalArgumentException
+
 /**
  * Сортировка времён
  *
@@ -63,7 +66,23 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val listOfPersons = File(inputName).readLines()
+    val resultMap = mutableMapOf<String, MutableList<String>>()
+    File(outputName).bufferedWriter().use { it ->
+        for (person in listOfPersons) {
+            require(person.matches(Regex("""([A-zА-яёЁ]+) ([A-zА-яёЁ]+) - ([A-zА-я-ёЁ]+) \d+""")))
+            val name = person.split(" - ")[0]
+            val street = person.split(" - ")[1]
+            resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name))
+        }
+        for ((street, name) in resultMap
+            .toSortedMap(compareBy({ it.split(" ").first() }, { it.split(" ").last().toInt() }))) {
+            name.sort()
+            it.write(street + " - " + name.joinToString(", ").trim())
+            it.newLine()
+        }
+    }
+    //Напишу "O" позже
 }
 
 /**
@@ -97,7 +116,9 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val result = File(inputName).readLines().map { it.toDouble() }.sorted()
+    File(outputName).writeText(result.joinToString("\n"))
+    //Напишу "O" позже
 }
 
 /**
