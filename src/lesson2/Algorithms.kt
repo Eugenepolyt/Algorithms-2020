@@ -95,7 +95,28 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val firstLen = first.length
+    val secondLen = second.length
+    val table = List(firstLen + 1) { MutableList(secondLen + 1) { 0 } }
+    var maxSub = 0
+    var secondIndex = 0
+    for (i in 0..firstLen) {
+        for (j in 0..secondLen) {
+            if (i == 0 || j == 0) {
+                table[i][j] = 0
+            } else if (first[i - 1] == second[j - 1]) {
+                table[i][j] = table[i - 1][j - 1] + 1
+                if (maxSub < table[i][j]) {
+                    maxSub = table[i][j]
+                    secondIndex = j
+                }
+            } else table[i][j] = 0
+        }
+    }
+    if (maxSub == 0) return ""
+    return second.slice(secondIndex - maxSub until secondIndex) // O(K) ?
+    //Трудоёмкость - O(N*M + K)
+    //Ресурсоемкость - O(N*M)
 }
 
 /**
