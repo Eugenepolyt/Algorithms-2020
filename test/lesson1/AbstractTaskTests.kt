@@ -68,6 +68,12 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             File("temp.txt").delete()
         }
         try {
+            sortAddresses("input/my_adresses_test.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/my_adresses_test_out.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
             sortAddresses("input/addr_in3.txt", "temp.txt")
             assertFileContent("temp.txt", File("input/addr_out3.txt").readLines())
         } finally {
@@ -115,6 +121,13 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     121.3
                 """.trimIndent()
             )
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            sortTemperatures("input/my_temperature_test.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/my_temperature_test_out.txt").readLines())
         } finally {
             File("temp.txt").delete()
         }

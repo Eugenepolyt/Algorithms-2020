@@ -66,23 +66,27 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    val listOfPersons = File(inputName).readLines()
-    val resultMap = mutableMapOf<String, MutableList<String>>()
+    val listOfPersons = File(inputName).readLines() // O (N)
+    var resultMap = mutableMapOf<String, MutableList<String>>()
     File(outputName).bufferedWriter().use { it ->
-        for (person in listOfPersons) {
+        for (person in listOfPersons) { // O(N)
             require(person.matches(Regex("""([A-zА-яёЁ]+) ([A-zА-яёЁ]+) - ([A-zА-я-ёЁ]+) \d+""")))
-            val name = person.split(" - ")[0]
-            val street = person.split(" - ")[1]
-            resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name))
-        }
-        for ((street, name) in resultMap
-            .toSortedMap(compareBy({ it.split(" ").first() }, { it.split(" ").last().toInt() }))) {
-            name.sort()
+            val name = person.split(" - ")[0] // O(L) L - длинна строки person
+            val street = person.split(" - ")[1] // O(L)
+            resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name)) // O(1)
+        }  // O(N * L)
+
+        resultMap = resultMap
+            .toSortedMap(compareBy({ it.split(" ").first() }, { it.split(" ").last().toInt() }))
+        //0(M*logM)
+        for ((street, name) in resultMap) { // O(M)
+            name.sort() // O(L * C * Log C) C - длинна массива name
             it.write(street + " - " + name.joinToString(", ").trim())
             it.newLine()
         }
     }
-    //Напишу "O" позже
+    // Трудоемкость - O(N * L + M * Log M + M * L * C * Log c) = O(M * (LogM + L * C * Log C) + N * L)
+    // Ресурсоемкость - O(N)
 }
 
 /**
@@ -116,9 +120,13 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    val result = File(inputName).readLines().map { it.toDouble() }.sorted()
-    File(outputName).writeText(result.joinToString("\n"))
-    //Напишу "O" позже
+    val result = File(inputName).readLines().map { (it.replace(".", "").toInt() + 2730) }.toIntArray()
+    File(outputName).writeText(
+        countingSort(result, 7730).map { (it - 2730).toFloat() / 10 }.joinToString("\n")
+    )
+
+    // Трудоемкость - O(N) // Ресурсоемкость - O(N)
+
 }
 
 /**
