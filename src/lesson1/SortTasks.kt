@@ -73,8 +73,8 @@ fun sortAddresses(inputName: String, outputName: String) {
             require(person.matches(Regex("""([A-zА-яёЁ]+) ([A-zА-яёЁ]+) - ([A-zА-я-ёЁ]+) \d+""")))
             val name = person.split(" - ")[0] // O(L) L - длинна строки person
             val street = person.split(" - ")[1] // O(L)
-            resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name)) // O(D) - можно опустить
-        }  // O(N * L)
+            resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name)) // O(D)
+        }  // O(N * L * D)
 
         resultMap = resultMap
             .toSortedMap(compareBy({ it.split(" ").first() }, { it.split(" ").last().toInt() }))
@@ -85,8 +85,8 @@ fun sortAddresses(inputName: String, outputName: String) {
             it.newLine()
         }
     }
-    //O(N * L + M * Log M + M * L * C * Log c) = O(M * (LogM + L * C * Log C) + N * L)
-    // M * (LogM + L * C * Log C) >>  N * L ->
+    //O(N * L * D + M * Log M + M * L * C * Log c) = O(M * (LogM + L * C * Log C) + N * L * D)
+    // M * (LogM + L * C * Log C) >>  N * L * D ->
     // Трудоемкость = O(M * (LogM + L * C * Log C))
     // Ресурсоемкость - O(N)
 }
