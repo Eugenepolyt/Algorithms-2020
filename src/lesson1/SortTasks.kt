@@ -71,7 +71,7 @@ fun sortAddresses(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use { it ->
         for (person in listOfPersons) { // O(N)
             require(person.matches(Regex("""([A-zА-яёЁ]+) ([A-zА-яёЁ]+) - ([A-zА-я-ёЁ]+) \d+""")))
-            val name = person.split(" - ")[0] // O(L) L - длинна строки person
+            val name = person.split(" - ")[0] // O(L)
             val street = person.split(" - ")[1] // O(L)
             resultMap[street]?.add(name) ?: resultMap.put(street, mutableListOf(name)) // O(D)
         }  // O(N * L * D)
@@ -80,7 +80,7 @@ fun sortAddresses(inputName: String, outputName: String) {
             .toSortedMap(compareBy({ it.split(" ").first() }, { it.split(" ").last().toInt() }))
         //0(M*logM)
         for ((street, name) in resultMap) { // O(M)
-            name.sort() // O(L * C * Log C) C - длинна массива name
+            name.sort() // O(L * C * Log C)
             it.write(street + " - " + name.joinToString(", ").trim())
             it.newLine()
         }
