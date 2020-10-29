@@ -47,7 +47,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
     }
     return firstIndexResult + 1 to secondIndexResult + 1
 
-
+    // Трудоемкость - O(N) // Ресурсоемкость - O(N)
 }
 
 /**

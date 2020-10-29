@@ -7,7 +7,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.IllegalStateException
 import kotlin.NoSuchElementException
 
-abstract class AbstractBinarySearchTreeTest {
+abstract class  AbstractBinarySearchTreeTest {
 
     abstract fun create(): CheckableSortedSet<Int>
 
@@ -31,6 +31,7 @@ abstract class AbstractBinarySearchTreeTest {
     }
 
     protected fun doAddTest() {
+
         implementationTest { create().add(0) }
         val random = Random()
         for (iteration in 1..100) {
@@ -107,6 +108,50 @@ abstract class AbstractBinarySearchTreeTest {
     }
 
     protected fun doRemoveTest() {
+        val controlSet = mutableSetOf<Int>()
+        controlSet.addAll(arrayOf(2, 7, 11, 36, 75, 42))
+
+        println("Initial set: $controlSet")
+        val binarySet = create()
+        for (element in controlSet) {
+            binarySet += element
+        }
+        controlSet.remove(75)
+        val expectedSize = binarySet.size - 1
+        val maxHeight = binarySet.height()
+        assertTrue(
+            binarySet.remove(75),
+            "An element was supposedly not removed from the tree when it should have been."
+        )
+        assertTrue(
+            75 !in binarySet,
+            "The tree contains a supposedly removed element."
+        )
+        assertTrue(
+            binarySet.checkInvariant(),
+            "The binary search tree invariant is false after BinarySearchTree.remove()."
+        )
+        assertTrue(
+            binarySet.height() <= maxHeight,
+            "The tree's height increased after BinarySearchTree.remove()."
+        )
+        assertFalse(
+            binarySet.remove(75),
+            "An element that was already not in the tree was supposedly removed."
+        )
+        assertEquals(
+            expectedSize, binarySet.size,
+            "The size of the tree is incorrect: was ${binarySet.size}, should've been $expectedSize."
+        )
+        for (element in controlSet) {
+            assertTrue(
+                binarySet.contains(element),
+                "The tree doesn't have the element $element from the control set."
+            )
+        }
+        println("All clear!")
+
+
         implementationTest { create().remove(0) }
         val random = Random()
         for (iteration in 1..100) {
@@ -208,6 +253,62 @@ abstract class AbstractBinarySearchTreeTest {
     }
 
     protected fun doIteratorRemoveTest() {
+
+        implementationTest { create().iterator().remove() }
+        val controlSet = TreeSet<Int>()
+        controlSet.addAll(arrayOf(2, 7, 11, 36, 75, 42))
+        val removed = 42
+        println("Initial set: $controlSet")
+        val binarySet = create()
+        for (element in controlSet) {
+            binarySet += element
+        }
+        controlSet.remove(removed)
+        println("Control set: $controlSet")
+        println("Removing element $removed from the tree through the iterator...")
+        val iterator = binarySet.iterator()
+        assertFailsWith<IllegalStateException>("Something was supposedly removed before the iteration started") {
+            iterator.remove()
+        }
+        var counter = binarySet.size
+        while (iterator.hasNext()) {
+            val element = iterator.next()
+            print("$element, ")
+            counter--
+            if (element == removed) {
+                iterator.remove()
+                assertFailsWith<IllegalStateException>("BinarySearchTreeIterator.remove() was successfully called twice in a row.") {
+                    iterator.remove()
+                }
+            }
+        }
+        assertEquals(
+            0, counter,
+            "BinarySearchTreeIterator.remove() changed iterator position: ${abs(counter)} elements were ${if (counter > 0) "skipped" else "revisited"}."
+        )
+        assertTrue(
+            binarySet.checkInvariant(),
+            "The binary search tree invariant is false after BinarySearchTreeIterator.remove()."
+        )
+        assertEquals(
+            controlSet.size, binarySet.size,
+            "The size of the tree is incorrect: was ${binarySet.size}, should've been ${controlSet.size}."
+        )
+        for (element in controlSet) {
+            assertTrue(
+                binarySet.contains(element),
+                "The tree doesn't have the element $element from the control set."
+            )
+        }
+        for (element in binarySet) {
+            assertTrue(
+                controlSet.contains(element),
+                "The tree has the element $element that is not in control set."
+            )
+        }
+        println("All clear!")
+
+
         implementationTest { create().iterator().remove() }
         val random = Random()
         for (iteration in 1..100) {

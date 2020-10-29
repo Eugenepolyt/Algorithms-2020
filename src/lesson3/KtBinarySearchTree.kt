@@ -67,6 +67,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         return true
     }
 
+
     /**
      * Удаление элемента из дерева
      *
@@ -79,8 +80,56 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      *
      * Средняя
      */
+    // Алгоритм взят из https://tproger.ru/translations/binary-search-tree-for-beginners/
+    // Сложность: O(log n) в среднем; O(n) в худшем случае.
+    // Затраты памяти - O(1)
+
+    private fun getParent(start: Node<T>, value: T, parent: Node<T>?): Node<T>? {
+        val comparison = value.compareTo(start.value)
+        return when {
+            comparison == 0 -> parent
+            comparison < 0 -> getParent(start.left!!, value, start)
+            else -> getParent(start.right!!, value, start)
+        }
+    }
+
+    private fun change(parent: Node<T>?, elementNode: Node<T>?, elementNodeSight: Node<T>?) {
+        if (parent != null) {
+            if (parent.left?.equals(elementNode) == true) parent.left = elementNodeSight
+            else if (parent.right?.equals(elementNode) == true) parent.right = elementNodeSight
+        } else root = elementNodeSight
+    }
+
     override fun remove(element: T): Boolean {
-        TODO()
+        val elementNode = find(element)
+
+        if (elementNode == null || elementNode.value != element) return false
+
+        val parent = getParent(root!!, element, null)
+
+        when {
+            elementNode.right == null -> change(parent, elementNode, elementNode.left)
+
+            elementNode.right?.left == null -> {
+                elementNode.right?.left = elementNode.left
+                change(parent, elementNode, elementNode.right)
+            }
+            else -> {
+                var farLeft = elementNode.right!!.left!!
+                var farLeftParent = elementNode.right!!
+                while (farLeft.left != null) {
+                    farLeftParent = farLeft
+                    farLeft = farLeft.left!!
+                }
+                farLeftParent.left = farLeft.right
+                farLeft.left = elementNode.left
+                farLeft.right = elementNode.right
+
+                change(parent, elementNode, farLeft)
+            }
+        }
+        size--
+        return true
     }
 
     override fun comparator(): Comparator<in T>? =
@@ -90,6 +139,21 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         BinarySearchTreeIterator()
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
+        // https://habr.com/ru/post/144850/
+        private var selected: Node<T>? = null
+        private var stack = Stack<Node<T>>()
+
+        private fun contInOrder(node: Node<T>?) {
+            if (node != null) {
+                stack.push(node)
+                contInOrder(node.left)
+            }
+
+        }
+
+        init {
+            contInOrder(root)
+        }
 
         /**
          * Проверка наличия следующего элемента
@@ -101,10 +165,8 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
-        override fun hasNext(): Boolean {
-            // TODO
-            throw NotImplementedError()
-        }
+        //Сложность: O(1)
+        override fun hasNext(): Boolean = stack.isNotEmpty()
 
         /**
          * Получение следующего элемента
@@ -119,9 +181,14 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+        // Сложность: O(log n)
+        // Память O(1)
         override fun next(): T {
-            // TODO
-            throw NotImplementedError()
+            if (stack.isEmpty()) throw NoSuchElementException()
+            selected = stack.pop()
+            contInOrder(selected!!.right)
+            return selected!!.value
+
         }
 
         /**
@@ -136,9 +203,12 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
+        //Сложность: O(log n) в среднем; O(n) в худшем случае.
+        // Память O(1)
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            check(selected != null)
+            remove(selected!!.value)
+            selected = null
         }
 
     }
