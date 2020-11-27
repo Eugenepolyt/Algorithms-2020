@@ -2,6 +2,9 @@
 
 package lesson6
 
+import java.util.*
+
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -28,9 +31,42 @@ package lesson6
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
+
+//Трудоёмкость - O(N)
+//Ресурсоемкость O(N)
+// Использованный алгоритм взят с https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_построения_Эйлерова_цикла
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    if (vertices.isEmpty()) return listOf()
+    for (vertex in vertices) {
+        if (getNeighbors(vertex).size % 2 != 0) return listOf()
+    }
+
+    val result = mutableListOf<Graph.Edge>()
+    val stack = Stack<Graph.Vertex>()
+    stack.push(vertices.first())
+    val edges = this.edges
+    while (stack.isNotEmpty()) {
+
+        val current = stack.peek()
+
+        for (vertex in vertices) {
+            if (edges.contains(getConnection(current, vertex))) {
+                stack.push(vertex)
+                edges.remove(getConnection(current, vertex))
+                break
+            }
+        }
+
+        if (current == stack.peek()) {
+            stack.pop()
+            if (stack.isNotEmpty()) {
+                result.add(getConnection(current, stack.peek())!!)
+            }
+        }
+    }
+    return result
 }
+
 
 /**
  * Минимальное остовное дерево.
@@ -94,6 +130,8 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
     TODO()
 }
 
+
+
 /**
  * Наидлиннейший простой путь.
  * Сложная
@@ -114,9 +152,34 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
  *
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
+
+//Трудоёмкость - O(N!)
+//Ресурсоемкость O(N!)
 fun Graph.longestSimplePath(): Path {
-    TODO()
+    if (this.vertices.isEmpty()) return Path()
+
+    var result = Path(this.vertices.first())
+    val stack = Stack<Path>()
+    var maxLength = -1
+
+    stack.addAll(this.vertices.map { Path(it) })
+
+    while (stack.isNotEmpty()) {
+        val current = stack.pop()
+        if (current.length > maxLength) {
+            maxLength = current.length
+            result = current
+            if (current.vertices.size == this.vertices.size) break
+        }
+        for (neighbor in this.getNeighbors(current.vertices.last())) {
+            if (neighbor !in current) {
+                stack.push(Path(current, this, neighbor))
+            }
+        }
+    }
+    return result
 }
+
 
 /**
  * Балда

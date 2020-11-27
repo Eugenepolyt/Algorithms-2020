@@ -38,6 +38,8 @@ class GraphBuilder {
         }
     }
 
+    fun getVertex(v: Vertex) = vertices[v.name]
+
     fun addConnection(begin: Vertex, end: Vertex, weight: Int = 1) {
         val edge = EdgeImpl(weight, begin, end)
         connections[begin] = connections[begin]?.let { it + edge } ?: setOf(edge)
