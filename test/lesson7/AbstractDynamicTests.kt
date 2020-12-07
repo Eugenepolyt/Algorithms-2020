@@ -36,6 +36,29 @@ abstract class AbstractDynamicTests {
                 """.trimIndent()
             ).length, "Answer must have length of $expectedLength2"
         )
+//my test
+        assertEquals(
+            """
+ого  уно,
+тго  о е,
+ройти  ас и рвношо рсо т гр
+            """.trimIndent(), longestCommonSubSequence(
+                """
+Любить вас долго было б скучно,
+Любить до гроба – право, смех,
+Пройти ж вас мимо равнодушно –
+Перед собою тяжкий грех.
+                """.trimIndent(),
+                """
+Много звезд у летней ночи,
+Отчего же только две у вас,
+Очи юга! Черны очи!
+Нашей встречи был недобрый час.
+Кто ни спросит, звезды ночи
+Лишь о райском счастье говорят
+                """.trimIndent()
+            )
+        )
     }
 
 

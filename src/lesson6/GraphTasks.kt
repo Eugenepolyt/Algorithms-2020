@@ -32,8 +32,8 @@ import java.util.*
  * связного графа ровно по одному разу
  */
 
-//Трудоёмкость - O(N)
-//Ресурсоемкость O(N)
+//Трудоёмкость - O(V + E)
+//Ресурсоемкость O(V + E)
 // Использованный алгоритм взят с https://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_построения_Эйлерова_цикла
 fun Graph.findEulerLoop(): List<Graph.Edge> {
     if (vertices.isEmpty()) return listOf()

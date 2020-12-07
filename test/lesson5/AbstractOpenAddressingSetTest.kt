@@ -76,6 +76,25 @@ abstract class AbstractOpenAddressingSetTest {
                 )
             }
         }
+        // my tests
+        val openAddressingSet = create<Int>(5)
+        openAddressingSet.add(1)
+        openAddressingSet.add(2)
+        openAddressingSet.add(3)
+        openAddressingSet.add(4)
+
+        assertTrue(
+            openAddressingSet.remove(2)
+        )
+        assertFalse(
+            openAddressingSet.remove(6)
+        )
+        assertFalse(
+            openAddressingSet.remove(2),
+            "An element wasn't removed contrary to expected."
+        )
+        assertEquals(3, openAddressingSet.size)
+
     }
 
     protected fun doIteratorTest() {
@@ -118,6 +137,15 @@ abstract class AbstractOpenAddressingSetTest {
             }
             println("All clear!")
         }
+        // my test
+        val openAddressingSet = create<Int>(6)
+        val iterator = openAddressingSet.iterator()
+        assertFalse(iterator.hasNext())
+        openAddressingSet.add(1)
+        assertTrue(iterator.hasNext())
+        assertEquals(1, iterator.next())
+        iterator.remove()
+        assertFalse(iterator.hasNext())
     }
 
     protected fun doIteratorRemoveTest() {
